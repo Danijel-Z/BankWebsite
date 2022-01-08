@@ -138,6 +138,7 @@ def seedData(db):
         antal = antal + 1
 
 
+<<<<<<< HEAD
 def mapNorthwindCategoryIdToThisDb(db, northwindCategporyId):
     namn = ""
     if northwindCategporyId == 1:
@@ -186,3 +187,5 @@ def addCat(db, namn, descr):
         c.Description = descr
         db.session.add(c)
         db.session.commit()
+=======
+>>>>>>> 8cc6e80b5a13c42ae0858038cb585207f2001ec7
