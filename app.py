@@ -14,9 +14,13 @@ migrate = Migrate(app, db)
 
 @app.route("/")
 def startpage():
-    trendingCategories = Category.query.all()
-    return render_template("index.html", trendingCategories=trendingCategories)
+    #trendingCategories = Category.query.all()
+    #trendingCategories=trendingCategories
+    return render_template("index.html")
 
+@app.route("/charts")
+def charts():
+    return render_template("pages/charts/chartjs.html")
 
 @app.route("/category/<id>")
 def category(id):
@@ -28,5 +32,5 @@ if __name__ == "__main__":
     with app.app_context():
         upgrade()
 
-    # seedData(db)
-    app.run()
+    app.run(host="127.0.0.1", port=5000, debug=True)
+    seedData(db)
