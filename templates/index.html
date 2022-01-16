@@ -148,6 +148,14 @@
             </a>
           </li>
           <li class="nav-item menu-items">
+            <a class="nav-link" href="{{url_for('test')}}">
+              <span class="menu-icon">
+                <i class="mdi mdi-brightness-7"></i>
+              </span>
+              <span class="menu-title">Test</span>
+            </a>
+          </li>
+          <li class="nav-item menu-items">
             <a
               class="nav-link"
               data-toggle="collapse"
@@ -281,8 +289,9 @@
               class="navbar-toggler navbar-toggler align-self-center"
               type="button"
               data-toggle="minimize"
+              title="Close/Open Sidebar"
             >
-              <span class="mdi mdi-menu"></span>
+              <span class="mdi mdi-menu icon-md"></span>
             </button>
             <ul class="navbar-nav w-100">
               <li class="nav-item w-100">
@@ -544,8 +553,8 @@
           </div>
         </nav>
         <!-- partial -->
-        {% block main%}
         <div class="main-panel">
+          {% block main%}
           <div class="content-wrapper">
             <div class="row">
               <div class="col-12 grid-margin stretch-card">
@@ -590,7 +599,7 @@
                         <div
                           class="d-flex d-sm-block d-md-flex align-items-center"
                         >
-                          <h2 class="mb-0">500</h2>
+                          <h2 class="mb-0">{{numberOfCustomers}}</h2>
                           <p class="text-success ml-2 mb-0 font-weight-medium">
                             +8%
                           </p>
@@ -619,7 +628,7 @@
                         <div
                           class="d-flex d-sm-block d-md-flex align-items-center"
                         >
-                          <h2 class="mb-0">1500</h2>
+                          <h2 class="mb-0">{{numberOfAccounts}}</h2>
                           <p class="text-success ml-2 mb-0 font-weight-medium">
                             +6.67%
                           </p>
@@ -642,13 +651,13 @@
               <div class="col-sm-4 grid-margin">
                 <div class="card">
                   <div class="card-body">
-                    <h4>Total Account Money</h4>
+                    <h4>Total Accounts Money</h4>
                     <div class="row">
                       <div class="col-8 col-sm-12 col-xl-8 my-auto">
                         <div
                           class="d-flex d-sm-block d-md-flex align-items-center"
                         >
-                          <h2 class="mb-0">150 000</h2>
+                          <h2 class="mb-0">{{TotalAccountsMoney}}</h2>
                           <p class="text-danger ml-2 mb-0 font-weight-medium">
                             -25%
                           </p>
@@ -1447,6 +1456,7 @@
               </div>
             </div>
           </div>
+          {% endblock main%}
           <!-- content-wrapper ends -->
           <!-- partial:partials/_footer.html -->
           <footer class="footer">
@@ -1472,7 +1482,7 @@
           </footer>
           <!-- partial -->
         </div>
-        {% endblock main%}
+
         <!-- main-panel ends -->
       </div>
       <!-- page-body-wrapper ends -->

@@ -1,7 +1,8 @@
 from flask import Flask, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate, upgrade
-from sqlalchemy import desc
+from sqlalchemy import desc, func
+# from sqlalchemy.sql import functions
 
 from model import db, seedData, Customer , Transaction, Account
 
@@ -15,16 +16,28 @@ migrate = Migrate(app, db)
 
 @app.route("/test")
 def test():
-
     join= db.session.query(Customer, Account).join(Account).filter(Account.CustomerId==Customer.id).where(Customer.id == 1544).order_by(desc(Account.Balance)).all()
-    hej = 2
-    return render_template("test.html", join = join)
+    listOfCustomers = Customer.query.get(1544)
+    listOfCustomers = Customer.query.limit(5).all()
+    allCustomers = Customer.query.count()
+    test = Customer.query.filter(Customer.id == 1544).first()
+    hej = Customer.query.limit(0.1*allCustomers+1).all()
+    
+    #listOfCustomers = db.session.query(Account).filter_by(id == 1).first()
+#.label('Money_Amount')
+    
+    return render_template("test.html", join = join,  listOfCustomers = listOfCustomers)
 
 @app.route("/")
 def startpage():
+    endastBalance= db.session.query(Account.Balance).all()
+    numberOfCustomers = Customer.query.count()
+    numberOfAccounts =  Account.query.count()
+    TotalAccountsMoney = db.session.query(func.sum(Account.Balance)).all()
+    TotalAccountsMoney = TotalAccountsMoney[0][0]
     #trendingCategories = Category.query.all()
     #trendingCategories=trendingCategories
-    return render_template("index.html")
+    return render_template("index.html", numberOfAccounts = numberOfAccounts, numberOfCustomers= numberOfCustomers, TotalAccountsMoney = TotalAccountsMoney)
 
 @app.route("/charts")
 def charts():

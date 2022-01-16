@@ -1,70 +1,113 @@
 {% extends 'index.html' %} {% block title %} Test {% endblock title %} {% block
 individualCSS %} {% endblock individualCSS %} {% block main %}
 
-<div class="main-panel">
-  <div class="content-wrapper">
-    <div class="page-header">
-      <h3 class="page-title">Test</h3>
-      <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="#">Databas</a></li>
-          <li class="breadcrumb-item active" aria-current="page">Test</li>
-        </ol>
-      </nav>
-    </div>
-    <div class="row">
-      <div class="col-md-12 grid-margin">
-        <div class="card">
-          <div class="card-body">
-            <h4 class="card-title">Text colors</h4>
-            <p class="card-description">
-              Use class <code>.text-primary</code>,
-              <code>.text-secondary</code> etc. for text in theme colors
-            </p>
-            <div class="row">
-              <div class="col-md-6">
-                {% for customer, account in join %}
-                <p class="text-primary">{{customer.id}} {{customer.City}}</p>
-                <p class="text-success">{{account.id}} {{account.Balance}}</p>
-                <p class="text-danger">{{customer.GivenName}}</p>
-                <p class="text-warning">{{customer.Surname}}</p>
-                <p class="text-info">{{customer.Telephone}}</p>
-                {% endfor %}
-              </div>
-              <div class="col-md-6">
-                <p class="text-light bg-dark pl-1">.text-light</p>
-                <p class="text-secondary">.text-secondary</p>
-                <p class="text-dark">.text-dark</p>
-                <p class="text-muted">.text-muted</p>
-                <p class="text-white bg-dark pl-1">.text-white</p>
-              </div>
+<div class="content-wrapper">
+  <div class="page-header">
+    <h3 class="page-title">Test</h3>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="#">Databas</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Test</li>
+      </ol>
+    </nav>
+  </div>
+  <div class="row">
+    <div class="col-md-12 grid-margin">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title">Text colors</h4>
+          <p class="card-description">
+            Use class <code>.text-primary</code>,
+            <code>.text-secondary</code> etc. for text in theme colors
+          </p>
+          <div class="row">
+            <div class="col-md-6">
+              {% for customer, account in join %}
+              <p class="text-primary">{{customer.id}} {{customer.City}}</p>
+              <p class="text-success">{{account.id}} {{account.Balance}}</p>
+              <p class="text-danger">{{customer.GivenName}}</p>
+              <p class="text-warning">{{customer.Surname}}</p>
+              <p class="text-info">{{customer.Telephone}}</p>
+              {% endfor %}
+            </div>
+            <div class="col-md-6">
+              <p class="text-light bg-dark pl-1">.text-light</p>
+              <p class="text-secondary">.text-secondary</p>
+              <p class="text-dark">.text-dark</p>
+              <p class="text-muted">.text-muted</p>
+              <p class="text-white bg-dark pl-1">.text-white</p>
             </div>
           </div>
         </div>
       </div>
     </div>
   </div>
+  <div class="row">
+    <div class="col-lg-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title">List Of All Accounts</h4>
+          <div class="form-inline row grid-margin">
+            <p class="card-description col-lg-7">
+              Use search to find an specific account<code
+                ><i class="mdi mdi-arrow-right"></i
+              ></code>
+            </p>
+            <div class="col-lg-5">
+              <div class="input-group">
+                <input
+                  type="text"
+                  class="form-control col-lg-9"
+                  placeholder="Recipient's username"
+                  aria-label="Recipient's username"
+                  aria-describedby="basic-addon2"
+                />
+                <div class="input-group-append">
+                  <button class="btn btn-md btn-primary" type="button">
+                    Search
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-hover table-bordered">
+              <thead>
+                <tr>
+                  <th>kundnummer</th>
+                  <th>personnummer</th>
+                  <th>namn</th>
+                  <th>adress</th>
+                  <th>city</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for customer in listOfCustomers %}
+                <tr>
+                  <td>{{customer.id}}</td>
+                  <td>{{customer.Birthday}}</td>
+                  <td class="text-danger">
+                    {{customer.GivenName}} {{customer.Surname}}
+                    <i class="mdi mdi-arrow-down"></i>
+                  </td>
+                  <td>{{customer.Streetaddress}}</td>
 
-  <footer class="footer">
-    <div class="d-sm-flex justify-content-center justify-content-sm-between">
-      <span
-        class="text-muted d-block text-center text-sm-left d-sm-inline-block"
-        >Copyright © bootstrapdash.com 2020</span
-      >
-      <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center">
-        Free
-        <a
-          href="https://www.bootstrapdash.com/bootstrap-admin-template/"
-          target="_blank"
-          >Bootstrap admin templates</a
-        >
-        from Bootstrapdash.com</span
-      >
+                  <td>
+                    <label class="badge badge-danger">{{customer.City}}</label>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
-  </footer>
+  </div>
 </div>
+
 {% endblock main %}
 
-<!-- Plugin js for this page -->
+<!-- Plugin js and custom js for this page -->
 {% block individualJS %} {% endblock individualJS %}
-<!-- End plugin js for this page -->
+<!-- End plugin js and custom js for this page -->
