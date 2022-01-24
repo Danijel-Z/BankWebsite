@@ -60,12 +60,14 @@
         <div
           class="sidebar-brand-wrapper d-none d-lg-flex align-items-center justify-content-center fixed-top"
         >
-          <a class="sidebar-brand brand-logo" href="index.html"
+          <a class="sidebar-brand brand-logo" href="{{url_for('startpage')}}"
             ><img
               src="{{url_for('static', filename='assets/images/logo.svg')}}"
               alt="logo"
           /></a>
-          <a class="sidebar-brand brand-logo-mini" href="index.html"
+          <a
+            class="sidebar-brand brand-logo-mini"
+            href="{{url_for('startpage')}}"
             ><img
               src="{{url_for('static', filename='assets/images/logo-mini.svg')}}"
               alt="logo"
@@ -148,14 +150,6 @@
             </a>
           </li>
           <li class="nav-item menu-items">
-            <a class="nav-link" href="{{url_for('test')}}">
-              <span class="menu-icon">
-                <i class="mdi mdi-brightness-7"></i>
-              </span>
-              <span class="menu-title">Test</span>
-            </a>
-          </li>
-          <li class="nav-item menu-items">
             <a
               class="nav-link"
               data-toggle="collapse"
@@ -186,6 +180,22 @@
                 </li>
               </ul>
             </div>
+          </li>
+          <li class="nav-item menu-items">
+            <a class="nav-link" href="{{url_for('teststartpage')}}">
+              <span class="menu-icon">
+                <i class="mdi mdi-wrench"></i>
+              </span>
+              <span class="menu-title">Test Dashboard</span>
+            </a>
+          </li>
+          <li class="nav-item menu-items">
+            <a class="nav-link" href="{{url_for('test')}}">
+              <span class="menu-icon">
+                <i class="mdi mdi-brightness-7"></i>
+              </span>
+              <span class="menu-title">Test</span>
+            </a>
           </li>
           <li class="nav-item menu-items">
             <a class="nav-link" href="{{url_for('forms')}}">

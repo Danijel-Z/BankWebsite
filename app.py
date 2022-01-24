@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request
+from datetime import date
+from flask import Flask, redirect, render_template, request, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate, upgrade
 from sqlalchemy import desc, func
@@ -6,27 +7,136 @@ from sqlalchemy import desc, func
 
 from model import db, seedData, Customer , Transaction, Account
 
-
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:password@localhost/Bank'
 db.app = app
 db.init_app(app)
 migrate = Migrate(app, db)
 
+def calculateAge(birthDate: date) -> int:
+    today = date.today()
+    age = today.year - birthDate.year - ((today.month, today.day) < (birthDate.month, birthDate.day))
+ 
+    return age
 
-@app.route("/test")
+def getOrder(sortColumn, sortOrder, page, searchWord):
+    
+    if sortColumn == "" or sortColumn == None:
+        sortColumn = "Surname"
+
+    if sortOrder == "" or sortOrder == None:
+        sortOrder = "asc"
+    
+    Customers = Customer.query.filter(
+            Customer.GivenName.like('%' + searchWord + '%') | 
+            Customer.City.like('%' + searchWord + '%') |
+            Customer.id.like(searchWord) )
+
+    if sortColumn == "Name":
+        if sortOrder == "desc":
+            Customers = Customers.order_by(Customer.Surname.desc())
+        else:
+            Customers = Customers.order_by(Customer.Surname.asc())
+
+    if sortColumn == "City":
+        if sortOrder == "desc":
+            Customers = Customers.order_by(Customer.City.desc())
+        else:
+            Customers = Customers.order_by(Customer.City.asc())
+
+    if sortColumn == "Streetaddress":
+        if sortOrder == "desc":
+            Customers = Customers.order_by(Customer.Streetaddress.desc())
+        else:
+            Customers = Customers.order_by(Customer.Streetaddress.asc())
+    
+    if sortColumn == "Birthday":
+        if sortOrder == "desc":
+            Customers = Customers.order_by(Customer.Birthday.desc())
+        else:
+            Customers = Customers.order_by(Customer.Birthday.asc())
+    
+    if sortColumn == "Customer ID":
+        if sortOrder == "desc":
+            Customers = Customers.order_by(Customer.id.desc())
+        else:
+            Customers = Customers.order_by(Customer.id.asc())
+
+    paginationObject = Customers.paginate(page,20,False)
+
+    return paginationObject
+# {% load static %}
+# {% static 'style.css' %}
+
+
+@app.route("/transaction/<int:account_id>", methods= ["GET", "POST"])
+def transaction(account_id):
+    foundedTransaction = Transaction.query.filter(Transaction.AccountId == account_id)
+    if foundedTransaction.first():
+        accountTransactions = foundedTransaction.order_by(Transaction.Date.desc())
+        page = int(request.args.get('page', 1))
+        paginationObject = accountTransactions.paginate(page,20,False)
+        customer_id = request.args.get('customer_id')
+        accountBalance = foundedTransaction.first().Account.Balance
+        accountBalance = "${:,}".format(accountBalance)
+        #customer_id = foundedTransaction.Account.CustomerId ##  Ger Customer ID
+        return render_template('transaction.html', account_id = account_id, accountBalance= accountBalance, customer_id= customer_id,  accountTransactions = paginationObject.items, has_next= paginationObject.has_next,
+                                has_prev= paginationObject.has_prev, pages= paginationObject.pages , page = page)
+    
+    return redirect(url_for('test'))
+    
+
+
+
+@app.route("/test", methods= ["GET", "POST"])
 def test():
-    join= db.session.query(Customer, Account).join(Account).filter(Account.CustomerId==Customer.id).where(Customer.id == 1544).order_by(desc(Account.Balance)).all()
-    listOfCustomers = Customer.query.get(1544)
-    listOfCustomers = Customer.query.limit(5).all()
+    sortColumn = request.args.get('sortColumn')
+    sortOrder = request.args.get('sortOrder')
+    page = int(request.args.get('page', 1))
+    searchWord = request.args.get('search','')
+    listOfCustomers= getOrder(sortColumn, sortOrder, page, searchWord)
+
+    customer_id = request.args.get('customer_id', "")
+
+    foundedCustomer = Customer.query.get(customer_id)
+    totalMoneyFromAccounts = 0
+    customer_age = 0
+    if foundedCustomer:
+        totalMoneyFromAccounts = sum( [acc.Balance for acc in foundedCustomer.Accounts] )
+        totalMoneyFromAccounts = "${:,}".format(totalMoneyFromAccounts)
+        year, month, day = foundedCustomer.Birthday.strftime('%Y-%m-%d').split('-')
+        customer_age = calculateAge(date(int(year), int(month), int(day))) 
+    join= db.session.query(Customer, Account).join(Account).where(Customer.id == 1544).order_by(desc(Account.Balance)).all()
+    # listOfCustomers = Customer.query.get(1544)
+    # listOfCustomers = Customer.query.limit(5).all()
     allCustomers = Customer.query.count()
     test = Customer.query.filter(Customer.id == 1544).first()
     hej = Customer.query.limit(0.1*allCustomers+1).all()
-    
+    transaktioner = Account.query.all()
     #listOfCustomers = db.session.query(Account).filter_by(id == 1).first()
 #.label('Money_Amount')
     
-    return render_template("test.html", join = join,  listOfCustomers = listOfCustomers)
+    return render_template("test.html", customer_age= customer_age, foundedCustomer = foundedCustomer, customer_id= customer_id, totalMoneyFromAccounts= totalMoneyFromAccounts,
+    join = join,  
+    listOfCustomers = listOfCustomers.items, 
+    page=page,
+    sortColumn=sortColumn,
+    sortOrder=sortOrder,
+    q=searchWord,
+    has_next= listOfCustomers.has_next,
+    has_prev= listOfCustomers.has_prev, 
+    pages= listOfCustomers.pages,
+    transaktioner = transaktioner)
+
+@app.route("/tstartpage")
+def teststartpage():
+    # h = db.session.query(Customer)
+    # d = h.order_by(desc(Customer.id)).all()
+    numberOfCustomers = Customer.query.count()
+    numberOfAccounts =  Account.query.count()
+    TotalAccountsMoney = db.session.query(func.sum(Account.Balance)).all()
+    TotalAccountsMoney = TotalAccountsMoney[0][0]
+    return render_template("teststartpage.html", numberOfAccounts = numberOfAccounts, numberOfCustomers= numberOfCustomers, TotalAccountsMoney = TotalAccountsMoney)
 
 @app.route("/")
 def startpage():
