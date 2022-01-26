@@ -1,0 +1,20 @@
+{% macro render_field(field) %}
+
+<div class="form-group">
+  {{ field.label(class="form-control-label") }} {{ field(class="form-control")
+  }}
+  <!-- <label for="nf-email" class=" form-control-label">Email</label>
+    <input type="email" id="nf-email" name="nf-email" placeholder="Enter Email.." class="form-control"> -->
+  {% for error in field.errors %}
+  <span class=""> {{error}}</span>
+  {% endfor %}
+</div>
+{% endmacro %} {% macro render_selectField(selectField) %}
+<div class="form-check pl-1">
+  {{ selectField.label(class="form-control-label text-info h4") }} {{
+  selectField(class="list-inline list-group h6") }} {% for error in
+  selectField.errors %}
+  <span class=""> {{error}}</span>
+  {% endfor %}
+</div>
+{% endmacro %}

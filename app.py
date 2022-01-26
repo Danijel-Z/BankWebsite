@@ -1,17 +1,42 @@
-from datetime import date
+from datetime import date, datetime
 from flask import Flask, redirect, render_template, request, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate, upgrade
 from sqlalchemy import desc, func
+from form import TransferForm, Deposit_Withdrawal_Form
 # from sqlalchemy.sql import functions
 
 from model import db, seedData, Customer , Transaction, Account
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:password@localhost/Bank'
+app.config['SECRET_KEY'] = 'hejhej'
+
 db.app = app
 db.init_app(app)
 migrate = Migrate(app, db)
+
+
+
+def calculateNewBalance(choice, amount, findAccount):
+    newAmount = 0
+    if choice == "Deposit":
+        newAmount = findAccount.Balance + amount
+    
+    elif choice == "Withdraw":
+        newAmount = findAccount.Balance - amount
+    
+    return newAmount
+
+
+
+
+
+
+
+
+
+
 
 def calculateAge(birthDate: date) -> int:
     today = date.today()
@@ -67,6 +92,53 @@ def getOrder(sortColumn, sortOrder, page, searchWord):
     return paginationObject
 # {% load static %}
 # {% static 'style.css' %}
+
+@app.route("/transfer", methods=["POST", "GET"])
+def transfer():
+    form = TransferForm()
+    if form.validate_on_submit():
+        return redirect('test.html')
+    return render_template('pay_or_transer.html', form = form )
+
+
+
+
+@app.route("/deposit&withdraw", methods=["POST", "GET"])
+def deposit_withdraw():
+    form = Deposit_Withdrawal_Form()
+    if form.validate_on_submit():
+        findAccount = Account.query.filter(Account.id == form.fromAccount.data).first()
+        findAccount = Account.query.get(form.fromAccount.data)
+
+        if findAccount:
+            choice = form.choice.data
+            amount = form.amount.data
+            
+            newBalance = calculateNewBalance(choice, amount, findAccount)
+        
+            newAccountTransaction = Transaction()
+        
+            newAccountTransaction.Type = "Debit"
+            newAccountTransaction.Operation = choice
+            newAccountTransaction.Date = datetime.now()
+            newAccountTransaction.Amount = amount
+            newAccountTransaction.NewBalance = newBalance
+            newAccountTransaction.AccountId = findAccount.id
+
+            findAccount.Balance = newBalance
+
+            db.session.add(newAccountTransaction)
+            db.session.commit()
+
+            return redirect( url_for('deposit_withdraw', form = form) )
+        
+    return render_template('deposit_withdraw.html', form = form )
+
+
+
+
+
+
 
 
 @app.route("/transaction/<int:account_id>", methods= ["GET", "POST"])
