@@ -5,10 +5,9 @@ title %} {% block individualCSS %} {% endblock individualCSS %} {% block main %}
   <div class="row">
     <div class="col-sm-4 grid-margin">
       <form method="post">
-        {{ form.hidden_tag() }} {{ form.csrf_token }} {{
-        render_field(form.fromAccount) }} {{ render_field(form.toAccount) }}
-        {{render_selectField(form.choice)}} {{ render_field(form.amount) }} {{
-        render_field(form.submit) }}
+        {{ form.hidden_tag() }} {{ render_field(form.fromAccount) }} {{
+        render_field(form.toAccount) }} {{render_selectField(form.choice)}} {{
+        render_field(form.amount) }} {{ render_field(form.submit) }}
       </form>
     </div>
   </div>

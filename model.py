@@ -1,8 +1,8 @@
 from flask_sqlalchemy import SQLAlchemy
 import barnum
 import random
-from datetime import datetime
-from datetime import timedelta
+from datetime import datetime, timedelta
+from flask_user import  UserMixin, UserManager
 
 db = SQLAlchemy()
 
@@ -50,14 +50,47 @@ class Transaction(db.Model):
     AccountId = db.Column(db.Integer, db.ForeignKey(
         'Accounts.id'), nullable=False)
 
-# class Category(db.Model):
-#     __tablename__= "Categories"
-#     id = db.Column(db.Integer, primary_key=True)
-#     CategoryName = db.Column(db.String(15), unique=False, nullable= False)
-#     Description = db.Column(db.Text, unique= False, nullable = True)
+class User(db.Model, UserMixin):
+    __tablename__ = 'users'
+    id = db.Column(db.Integer, primary_key=True)
+    active = db.Column('is_active', db.Boolean(), nullable=False, server_default='1')
+
+    # User authentication information. The collation='NOCASE' is required
+    # to search case insensitively when USER_IFIND_MODE is 'nocase_collation'.
+    email = db.Column(db.String(255), nullable=False, unique=True)
+    email_confirmed_at = db.Column(db.DateTime()) 
+
+    password = db.Column(db.String(255), nullable=False, server_default='')
+
+    # User information
+    first_name = db.Column(db.String(100), nullable=False, server_default='')
+    last_name = db.Column(db.String(100), nullable=False, server_default='')
+
+    # Define the relationship to Role via UserRoles
+    roles = db.relationship('Role', secondary='user_roles')
+
+# Define the Role data-model
+class Role(db.Model):
+    __tablename__ = 'roles'
+    id = db.Column(db.Integer(), primary_key=True)
+    name = db.Column(db.String(50), unique=True)
+
+# Define the UserRoles association table
+class UserRoles(db.Model):
+    __tablename__ = 'user_roles'
+    id = db.Column(db.Integer(), primary_key=True)
+    user_id = db.Column(db.Integer(), db.ForeignKey('users.id', ondelete='CASCADE'))
+    role_id = db.Column(db.Integer(), db.ForeignKey('roles.id', ondelete='CASCADE'))
+
+user_manager = UserManager(None, db, User) 
 
 
 def seedData(db):
+    AddRoleIfNotExists("Admin")
+    AddRoleIfNotExists("Customer")
+    AddLoginIfNotExists("admin@example.com", "Hejsan123#",["Admin"])
+    AddLoginIfNotExists("customer@example.com", "Hejsan123#",["Customer"])
+
     antal = Customer.query.count()
     while antal < 5000:
         customer = Customer()
@@ -136,3 +169,26 @@ def seedData(db):
         db.session.commit()
 
         antal = antal + 1
+
+def AddRoleIfNotExists(namn:str): 
+    if Role.query.filter(Role.name == namn).first():
+        return
+    role = Role()
+    role.name = namn
+    db.session.add(role)
+    db.session.commit()
+
+
+def AddLoginIfNotExists(email:str, passwd:str, roles:list[str]):
+    if User.query.filter(User.email == email).first():
+        return
+    user = User()
+    user.email=email
+    user.email_confirmed_at=datetime.utcnow()
+    user.password=user_manager.hash_password(passwd)    
+    for roleName in roles:
+        role = Role.query.filter(Role.name == roleName).first()
+        user.roles.append(role)
+
+    db.session.add(user)
+    db.session.commit()

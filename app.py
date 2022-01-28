@@ -4,22 +4,21 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate, upgrade
 from sqlalchemy import desc, func
 from form import TransferForm, Deposit_Withdrawal_Form
-# from sqlalchemy.sql import functions
-
-from model import db, seedData, Customer , Transaction, Account
+from model import db, seedData, Customer , Transaction, Account, User, user_manager
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:password@localhost/Bank'
-app.config['SECRET_KEY'] = 'hejhej'
-
+app.config.from_object('config.ConfigDebug')
 db.app = app
 db.init_app(app)
 migrate = Migrate(app, db)
+user_manager.app = app
+user_manager.init_app(app,db,User)
 
 
 
 def calculateNewBalance(choice, amount, findAccount):
-    newAmount = 0
+    newAmount = findAccount.Balance
+
     if choice == "Deposit":
         newAmount = findAccount.Balance + amount
     
@@ -27,15 +26,6 @@ def calculateNewBalance(choice, amount, findAccount):
         newAmount = findAccount.Balance - amount
     
     return newAmount
-
-
-
-
-
-
-
-
-
 
 
 def calculateAge(birthDate: date) -> int:
@@ -98,7 +88,7 @@ def transfer():
     form = TransferForm()
     if form.validate_on_submit():
         return redirect('test.html')
-    return render_template('pay_or_transer.html', form = form )
+    return render_template('pay_or_transfer.html', form = form )
 
 
 
@@ -279,6 +269,6 @@ def category(id):
 if __name__ == "__main__":
     with app.app_context():
         upgrade()
-
+        seedData(db)
     app.run(host="127.0.0.1", port=5000, debug=True)
-    seedData(db)
+    
