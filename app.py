@@ -1,16 +1,20 @@
 from datetime import date, datetime
 from flask import Flask, redirect, render_template, request, url_for
-from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate, upgrade
 from sqlalchemy import desc, func
 from form import TransferForm, Deposit_Withdrawal_Form
 from model import db, seedData, Customer , Transaction, Account, User, user_manager
+from flask_user import login_required, current_app, roles_required, roles_accepted
+from flask_login import logout_user
 
 app = Flask(__name__)
 app.config.from_object('config.ConfigDebug')
+
 db.app = app
 db.init_app(app)
+
 migrate = Migrate(app, db)
+
 user_manager.app = app
 user_manager.init_app(app,db,User)
 
@@ -46,7 +50,7 @@ def getOrder(sortColumn, sortOrder, page, searchWord):
             Customer.GivenName.like('%' + searchWord + '%') | 
             Customer.City.like('%' + searchWord + '%') |
             Customer.id.like(searchWord) )
-
+   
     if sortColumn == "Name":
         if sortOrder == "desc":
             Customers = Customers.order_by(Customer.Surname.desc())
@@ -77,11 +81,37 @@ def getOrder(sortColumn, sortOrder, page, searchWord):
         else:
             Customers = Customers.order_by(Customer.id.asc())
 
-    paginationObject = Customers.paginate(page,20,False)
+    paginationObject = Customers.paginate(page,50,False)
 
     return paginationObject
 # {% load static %}
 # {% static 'style.css' %}
+
+
+# @app.route("/login", methods=["POST", "GET"])
+# #@roles_required("Admin") 
+# #@roles_accepted("Admin", "Customer") ## Här kan man vara antingen admin eller customer
+# def login():
+#     pass
+
+
+
+@app.route("/customerCard", methods=["POST", "GET"])
+def customerCard():
+    customer_id = request.args.get('customer_id', "")
+
+    foundedCustomer = Customer.query.get(customer_id)
+    totalMoneyFromAccounts = 0
+    customer_age = 0
+    if foundedCustomer:
+        totalMoneyFromAccounts = sum( [acc.Balance for acc in foundedCustomer.Accounts] )
+        totalMoneyFromAccounts = "${:,}".format(totalMoneyFromAccounts)
+        year, month, day = foundedCustomer.Birthday.strftime('%Y-%m-%d').split('-')
+        customer_age = calculateAge(date(int(year), int(month), int(day))) 
+    return render_template('customerCard.html', customer_age= customer_age, foundedCustomer = foundedCustomer, customer_id= customer_id, totalMoneyFromAccounts= totalMoneyFromAccounts)
+
+
+
 
 @app.route("/transfer", methods=["POST", "GET"])
 def transfer():
@@ -134,18 +164,19 @@ def deposit_withdraw():
 @app.route("/transaction/<int:account_id>", methods= ["GET", "POST"])
 def transaction(account_id):
     foundedTransaction = Transaction.query.filter(Transaction.AccountId == account_id)
+    customer_id = request.args.get('customer_id')
+
     if foundedTransaction.first():
         accountTransactions = foundedTransaction.order_by(Transaction.Date.desc())
         page = int(request.args.get('page', 1))
         paginationObject = accountTransactions.paginate(page,20,False)
-        customer_id = request.args.get('customer_id')
         accountBalance = foundedTransaction.first().Account.Balance
         accountBalance = "${:,}".format(accountBalance)
         #customer_id = foundedTransaction.Account.CustomerId ##  Ger Customer ID
         return render_template('transaction.html', account_id = account_id, accountBalance= accountBalance, customer_id= customer_id,  accountTransactions = paginationObject.items, has_next= paginationObject.has_next,
                                 has_prev= paginationObject.has_prev, pages= paginationObject.pages , page = page)
     
-    return redirect(url_for('test'))
+    return redirect(url_for('customerCard', customer_id= customer_id ))
     
 
 
@@ -157,17 +188,7 @@ def test():
     page = int(request.args.get('page', 1))
     searchWord = request.args.get('search','')
     listOfCustomers= getOrder(sortColumn, sortOrder, page, searchWord)
-
-    customer_id = request.args.get('customer_id', "")
-
-    foundedCustomer = Customer.query.get(customer_id)
-    totalMoneyFromAccounts = 0
-    customer_age = 0
-    if foundedCustomer:
-        totalMoneyFromAccounts = sum( [acc.Balance for acc in foundedCustomer.Accounts] )
-        totalMoneyFromAccounts = "${:,}".format(totalMoneyFromAccounts)
-        year, month, day = foundedCustomer.Birthday.strftime('%Y-%m-%d').split('-')
-        customer_age = calculateAge(date(int(year), int(month), int(day))) 
+    
     join= db.session.query(Customer, Account).join(Account).where(Customer.id == 1544).order_by(desc(Account.Balance)).all()
     # listOfCustomers = Customer.query.get(1544)
     # listOfCustomers = Customer.query.limit(5).all()
@@ -178,7 +199,7 @@ def test():
     #listOfCustomers = db.session.query(Account).filter_by(id == 1).first()
 #.label('Money_Amount')
     
-    return render_template("test.html", customer_age= customer_age, foundedCustomer = foundedCustomer, customer_id= customer_id, totalMoneyFromAccounts= totalMoneyFromAccounts,
+    return render_template("test.html",
     join = join,  
     listOfCustomers = listOfCustomers.items, 
     page=page,
@@ -269,6 +290,6 @@ def category(id):
 if __name__ == "__main__":
     with app.app_context():
         upgrade()
-        seedData(db)
+        seedData()
     app.run(host="127.0.0.1", port=5000, debug=True)
     

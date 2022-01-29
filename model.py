@@ -50,6 +50,7 @@ class Transaction(db.Model):
     AccountId = db.Column(db.Integer, db.ForeignKey(
         'Accounts.id'), nullable=False)
 
+
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -85,7 +86,7 @@ class UserRoles(db.Model):
 user_manager = UserManager(None, db, User) 
 
 
-def seedData(db):
+def seedData():
     AddRoleIfNotExists("Admin")
     AddRoleIfNotExists("Customer")
     AddLoginIfNotExists("admin@example.com", "Hejsan123#",["Admin"])
