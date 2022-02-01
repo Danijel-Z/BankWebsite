@@ -1,11 +1,11 @@
 from datetime import date, datetime
-from flask import Flask, redirect, render_template, request, url_for
+from flask import Flask, redirect, render_template, request, url_for, flash
 from flask_migrate import Migrate, upgrade
-from sqlalchemy import desc, func
+from sqlalchemy import desc, func, true
 from form import TransferForm, Deposit_Withdrawal_Form
 from model import db, seedData, Customer , Transaction, Account, User, user_manager
 from flask_user import login_required, current_app, roles_required, roles_accepted
-from flask_login import logout_user
+
 
 app = Flask(__name__)
 app.config.from_object('config.ConfigDebug')
@@ -90,13 +90,14 @@ def getOrder(sortColumn, sortOrder, page, searchWord):
 
 # @app.route("/login", methods=["POST", "GET"])
 # #@roles_required("Admin") 
-# #@roles_accepted("Admin", "Customer") ## Här kan man vara antingen admin eller customer
+# #@roles_accepted("Admin", "Cashier") ## Här kan man vara antingen admin eller customer
 # def login():
 #     pass
 
 
 
 @app.route("/customerCard", methods=["POST", "GET"])
+@roles_accepted("Admin", "Cashier")
 def customerCard():
     customer_id = request.args.get('customer_id', "")
 
@@ -114,16 +115,42 @@ def customerCard():
 
 
 @app.route("/transfer", methods=["POST", "GET"])
+@roles_required("Admin") 
 def transfer():
     form = TransferForm()
     if form.validate_on_submit():
-        return redirect('test.html')
-    return render_template('pay_or_transfer.html', form = form )
+
+        fromAccount = Account.query.get(form.fromAccount.data)
+        toAccount = Account.query.get(form.toAccount.data)
+        amountToTransfer = form.amount.data
+
+        if fromAccount != None and toAccount != None :
+
+            newBalanceFromAccount = calculateNewBalance("Withdraw", amountToTransfer, fromAccount)
+            newBalanceToAccount = calculateNewBalance("Deposit", amountToTransfer, toAccount)
+
+            transactionFromAccount = Transaction("Debit", "Transfer", datetime.now(), amountToTransfer, newBalanceFromAccount, fromAccount.id)
+            transactionToAccount = Transaction("Debit", "Transfer", datetime.now(), amountToTransfer, newBalanceToAccount, toAccount.id)
+
+            fromAccount.Balance = newBalanceFromAccount
+            toAccount.Balance = newBalanceToAccount
+
+            db.session.add_all([transactionFromAccount, transactionToAccount])
+            db.session.commit()
+
+            flash("Your money transfer has been succesful.")
+            return redirect('transfer')
+
+        flash("Something went wrong, please contact the authors.")
+        return redirect('transfer')
+    
+    return render_template('transfer.html', form = form )
 
 
 
 
 @app.route("/deposit&withdraw", methods=["POST", "GET"])
+@roles_required("Admin") 
 def deposit_withdraw():
     form = Deposit_Withdrawal_Form()
     if form.validate_on_submit():
@@ -162,6 +189,7 @@ def deposit_withdraw():
 
 
 @app.route("/transaction/<int:account_id>", methods= ["GET", "POST"])
+@roles_accepted("Admin", "Cashier")
 def transaction(account_id):
     foundedTransaction = Transaction.query.filter(Transaction.AccountId == account_id)
     customer_id = request.args.get('customer_id')
@@ -218,7 +246,8 @@ def teststartpage():
     numberOfCustomers = Customer.query.count()
     numberOfAccounts =  Account.query.count()
     TotalAccountsMoney = db.session.query(func.sum(Account.Balance)).all()
-    TotalAccountsMoney = TotalAccountsMoney[0][0]
+    TotalAccountsMoney = "${:,}".format(TotalAccountsMoney[0][0])  
+    
     return render_template("teststartpage.html", numberOfAccounts = numberOfAccounts, numberOfCustomers= numberOfCustomers, TotalAccountsMoney = TotalAccountsMoney)
 
 @app.route("/")
@@ -228,8 +257,6 @@ def startpage():
     numberOfAccounts =  Account.query.count()
     TotalAccountsMoney = db.session.query(func.sum(Account.Balance)).all()
     TotalAccountsMoney = TotalAccountsMoney[0][0]
-    #trendingCategories = Category.query.all()
-    #trendingCategories=trendingCategories
     return render_template("index.html", numberOfAccounts = numberOfAccounts, numberOfCustomers= numberOfCustomers, TotalAccountsMoney = TotalAccountsMoney)
 
 @app.route("/charts")
@@ -279,12 +306,6 @@ def icons():
     return render_template("pages/icons/mdi.html")
 
 ################### End Of UI ELements #####################
-
-
-@app.route("/category/<id>")
-def category(id):
-    products = Product.query.all()
-    return render_template("category.html", products=products)
 
 
 if __name__ == "__main__":

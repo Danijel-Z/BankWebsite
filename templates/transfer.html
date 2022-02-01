@@ -3,11 +3,17 @@ render_field, render_selectField %} {% block title %} Test Startpage {% endblock
 title %} {% block individualCSS %} {% endblock individualCSS %} {% block main %}
 <div class="content-wrapper">
   <div class="row">
+    {% with messages = get_flashed_messages() %} {% if messages %} {% for
+    message in messages %}
+    <span>{{message}}</span>
+    {% endfor %} {% endif %} {% endwith %}
+  </div>
+  <div class="row">
     <div class="col-sm-4 grid-margin">
       <form method="post">
         {{ form.hidden_tag() }} {{ render_field(form.fromAccount) }} {{
-        render_field(form.toAccount) }} {{render_selectField(form.choice)}} {{
-        render_field(form.amount) }} {{ render_field(form.submit) }}
+        render_field(form.toAccount) }} {{ render_field(form.amount) }} {{
+        render_field(form.submit) }}
       </form>
     </div>
   </div>

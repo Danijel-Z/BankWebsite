@@ -49,6 +49,15 @@ class Transaction(db.Model):
     NewBalance = db.Column(db.Integer, unique=False, nullable=False)
     AccountId = db.Column(db.Integer, db.ForeignKey(
         'Accounts.id'), nullable=False)
+    
+    def __init__(self, Type:str, Operation:str, Date:datetime, Amount:int, NewBalance:int, AccountId:int):
+        super().__init__()
+        self.Type = Type
+        self.Operation = Operation
+        self.Date = Date
+        self.Amount = Amount
+        self.NewBalance = NewBalance
+        self.AccountId = AccountId
 
 
 class User(db.Model, UserMixin):
@@ -88,9 +97,9 @@ user_manager = UserManager(None, db, User)
 
 def seedData():
     AddRoleIfNotExists("Admin")
-    AddRoleIfNotExists("Customer")
-    AddLoginIfNotExists("admin@example.com", "Hejsan123#",["Admin"])
-    AddLoginIfNotExists("customer@example.com", "Hejsan123#",["Customer"])
+    AddRoleIfNotExists("Cashier")
+    AddLoginIfNotExists("stefan.holmberg@systementor.se", "Hejsan123#",["Admin"])
+    AddLoginIfNotExists("stefan.holmberg@nackademin.se", "Hejsan123#",["Cashier"])
 
     antal = Customer.query.count()
     while antal < 5000:

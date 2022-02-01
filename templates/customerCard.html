@@ -17,24 +17,7 @@ individualCSS %} {% endblock individualCSS %} {% block main %}
         <div class="card-body">
           <h4 class="card-title">Customer Card</h4>
           <p class="card-description"></p>
-          <div>
-            <form method="get" class="input-group">
-              <input
-                type="text"
-                name="customer_id"
-                value="{{customer_id}}"
-                class="form-control"
-                placeholder="Enter Customer ID"
-                aria-label="Recipient's username"
-                aria-describedby="basic-addon2"
-              />
-              <div class="input-group-append">
-                <button class="btn btn-md btn-primary" type="submit">
-                  Find
-                </button>
-              </div>
-            </form>
-          </div>
+          <div></div>
           {% if foundedCustomer %}
           <div class="card mt-1 bg-dark border border-primary">
             <div class="pt-2 pl-1">

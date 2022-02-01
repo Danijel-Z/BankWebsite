@@ -176,7 +176,7 @@ individualCSS %} {% endblock individualCSS %} {% block main %}
 
                 {% endfor %} {% endif %}
               </tbody>
-              <tfooter>
+              <tfoot>
                 <tr>
                   <td class="text-left">
                     {% if has_prev %}
@@ -202,132 +202,8 @@ individualCSS %} {% endblock individualCSS %} {% block main %}
                     {% endif %}
                   </td>
                 </tr>
-              </tfooter>
+              </tfoot>
             </table>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="row justify-content-center">
-    <div class="col-md-6 grid-margin">
-      <div class="card">
-        <div class="card-body">
-          <h4 class="card-title">Customer finder</h4>
-          <p class="card-description"></p>
-          <div>
-            <form method="get" class="input-group">
-              <input
-                type="text"
-                name="customer_id"
-                value="{{customer_id}}"
-                class="form-control"
-                placeholder="Enter Customer ID"
-                aria-label="Recipient's username"
-                aria-describedby="basic-addon2"
-              />
-              <div class="input-group-append">
-                <button class="btn btn-md btn-primary" type="submit">
-                  Find
-                </button>
-              </div>
-            </form>
-          </div>
-          {% if foundedCustomer %}
-          <div class="card mt-1 bg-dark border border-primary">
-            <div class="pt-2 pl-1">
-              <div class="form-inline">
-                <h3 class="text-primary pr-2">ID:</h3>
-                <p class="h3 text-light">{{foundedCustomer.id}}</p>
-              </div>
-              <p class="text-info">
-                Name & age:
-                <code
-                  >{{foundedCustomer.GivenName}} {{foundedCustomer.Surname}},
-                  {{customer_age}}</code
-                >
-                <br />
-                Birthday:
-                <code>{{foundedCustomer.Birthday.strftime('%Y-%m-%d')}} </code>
-                <br />
-
-                Adress:
-                <code>
-                  {{foundedCustomer.Streetaddress}},
-                  {{foundedCustomer.City}}</code
-                >
-                <br />
-
-                Country:
-                <code>
-                  {{foundedCustomer.Country}}, {{foundedCustomer.Zipcode}}</code
-                >
-                <br />
-                Telephone:
-                <code>{{foundedCustomer.Telephone}} </code>
-                <br />
-
-                Email:
-                <code>{{foundedCustomer.EmailAddress}} </code>
-              </p>
-              <p class="text-info">
-                Number of Accounts:
-                <code> {{foundedCustomer.Accounts|length }} </code> <br />
-                Total Accounts Money: <code> {{totalMoneyFromAccounts}} </code>
-              </p>
-              <div
-                class="flex-row flex-wrap d-flex justify-content-between pb-2 pr-1"
-              >
-                {% for number in range(foundedCustomer.Accounts|length) %}
-                <a
-                  href="{{ url_for('transaction', account_id = foundedCustomer.Accounts[number].id, customer_id = customer_id )}}"
-                  ><b class="btn btn-outline-light m-1">
-                    Account {{number + 1 }}</b
-                  ></a
-                >
-                {% endfor %}
-              </div>
-            </div>
-            <div class="form-inline p-1">
-              <a
-                class="btn btn-outline-danger col-12"
-                href="{{url_for('test')}}"
-              >
-                Exit Find
-              </a>
-            </div>
-          </div>
-          {% endif %}
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-md-12 grid-margin">
-      <div class="card">
-        <div class="card-body">
-          <h4 class="card-title">Text colors</h4>
-          <p class="card-description">
-            Use class <code>.text-primary</code>,
-            <code>.text-secondary</code> etc. for text in theme colors
-          </p>
-          <div class="row">
-            <div class="col-md-6">
-              {% for customer, account in join %}
-              <p class="text-primary">{{customer.id}} {{customer.City}}</p>
-              <p class="text-success">{{account.id}} {{account.Balance}}</p>
-              <p class="text-danger">{{customer.GivenName}}</p>
-              <p class="text-warning">{{customer.Surname}}</p>
-              <p class="text-info">{{customer.Telephone}}</p>
-              {% endfor %}
-            </div>
-            <div class="col-md-6">
-              <p class="text-light bg-dark pl-1">.text-light</p>
-              <p class="text-secondary">.text-secondary</p>
-              <p class="text-dark">.text-dark</p>
-              <p class="text-muted">.text-muted</p>
-              <p class="text-white bg-dark pl-1">.text-white</p>
-            </div>
           </div>
         </div>
       </div>
