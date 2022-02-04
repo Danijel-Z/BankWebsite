@@ -4,7 +4,7 @@ from flask_migrate import Migrate, upgrade
 from sqlalchemy import desc, func, true
 from form import TransferForm, Deposit_Withdrawal_Form
 from model import db, seedData, Customer , Transaction, Account, User, user_manager
-from flask_user import login_required, current_app, roles_required, roles_accepted
+from flask_user import roles_required, roles_accepted
 
 
 app = Flask(__name__)
@@ -16,7 +16,12 @@ db.init_app(app)
 migrate = Migrate(app, db)
 
 user_manager.app = app
-user_manager.init_app(app,db,User)
+
+user_manager.init_app(app,db,User) 
+
+
+######################## Rad 166 måste fixas ####################
+
 
 
 
@@ -115,7 +120,7 @@ def customerCard():
 
 
 @app.route("/transfer", methods=["POST", "GET"])
-@roles_required("Admin") 
+#@roles_required("Admin") 
 def transfer():
     form = TransferForm()
     if form.validate_on_submit():
@@ -150,7 +155,7 @@ def transfer():
 
 
 @app.route("/deposit&withdraw", methods=["POST", "GET"])
-@roles_required("Admin") 
+#@roles_required("Admin") 
 def deposit_withdraw():
     form = Deposit_Withdrawal_Form()
     if form.validate_on_submit():
@@ -163,14 +168,7 @@ def deposit_withdraw():
             
             newBalance = calculateNewBalance(choice, amount, findAccount)
         
-            newAccountTransaction = Transaction()
-        
-            newAccountTransaction.Type = "Debit"
-            newAccountTransaction.Operation = choice
-            newAccountTransaction.Date = datetime.now()
-            newAccountTransaction.Amount = amount
-            newAccountTransaction.NewBalance = newBalance
-            newAccountTransaction.AccountId = findAccount.id
+            newAccountTransaction = Transaction("Debit", choice, datetime.now(), amount, newBalance, findAccount.id)
 
             findAccount.Balance = newBalance
 
@@ -282,6 +280,10 @@ def error500():
 @app.route("/login")
 def login():
     return render_template("pages/samples/login.html")
+
+@app.route("/flask")
+def flask_base():
+    return render_template("flask_user_layout.html")
 
 @app.route("/register")
 def register():
