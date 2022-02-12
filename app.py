@@ -1,11 +1,11 @@
 from datetime import date, datetime
 from flask import Flask, redirect, render_template, request, url_for, flash
 from flask_migrate import Migrate, upgrade
-from sqlalchemy import desc, func, true
+from sqlalchemy import desc, func
 from form import TransferForm, Deposit_Withdrawal_Form
 from model import db, seedData, Customer , Transaction, Account, User, user_manager
 from flask_user import roles_required, roles_accepted
-
+from customerSearchEngine import addDocuments, createIndex, client
 
 app = Flask(__name__)
 app.config.from_object('config.ConfigDebug')
@@ -16,7 +16,6 @@ db.init_app(app)
 migrate = Migrate(app, db)
 
 user_manager.app = app
-
 user_manager.init_app(app,db,User) 
 
 
@@ -89,6 +88,7 @@ def getOrder(sortColumn, sortOrder, page, searchWord):
     paginationObject = Customers.paginate(page,50,False)
 
     return paginationObject
+
 # {% load static %}
 # {% static 'style.css' %}
 
@@ -98,6 +98,29 @@ def getOrder(sortColumn, sortOrder, page, searchWord):
 # #@roles_accepted("Admin", "Cashier") ## Här kan man vara antingen admin eller customer
 # def login():
 #     pass
+
+
+@app.route("/k", methods= ["POST", "GET"])
+def customers():
+
+    sortColumn = request.args.get('sortColumn', "id")
+    sortOrder = request.args.get('sortOrder', "asc")
+    page = int(request.args.get('page', 1))
+
+    search = request.args.get('search','')
+
+    skip = (page-1) * 100
+    result = client.search(search_text=search,
+        include_total_count=True,skip=skip,
+        top=50,
+        order_by=sortColumn + ' '  + sortOrder )
+    total_pages = round( result.get_count()/50 )
+    if total_pages == 0:
+        total_pages = 1
+    top = 50
+    alla = result
+    return render_template('k.html', listOfCustomers=alla, page = page, sortColumn = sortColumn, sortOrder = sortOrder,
+                                     search = search, skip=skip, top = top, pages = total_pages )
 
 
 
@@ -112,8 +135,10 @@ def customerCard():
     if foundedCustomer:
         totalMoneyFromAccounts = sum( [acc.Balance for acc in foundedCustomer.Accounts] )
         totalMoneyFromAccounts = "${:,}".format(totalMoneyFromAccounts)
+
         year, month, day = foundedCustomer.Birthday.strftime('%Y-%m-%d').split('-')
-        customer_age = calculateAge(date(int(year), int(month), int(day))) 
+        customer_age = calculateAge( date( int(year), int(month), int(day) ) ) 
+
     return render_template('customerCard.html', customer_age= customer_age, foundedCustomer = foundedCustomer, customer_id= customer_id, totalMoneyFromAccounts= totalMoneyFromAccounts)
 
 
@@ -159,8 +184,8 @@ def transfer():
 def deposit_withdraw():
     form = Deposit_Withdrawal_Form()
     if form.validate_on_submit():
+        
         findAccount = Account.query.filter(Account.id == form.fromAccount.data).first()
-        findAccount = Account.query.get(form.fromAccount.data)
 
         if findAccount:
             choice = form.choice.data
@@ -174,6 +199,7 @@ def deposit_withdraw():
 
             db.session.add(newAccountTransaction)
             db.session.commit()
+            
 
             return redirect( url_for('deposit_withdraw', form = form) )
         
