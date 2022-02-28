@@ -52,7 +52,7 @@ def createIndex():
         scoring_profiles=scoring_profiles,
         cors_options=cors_options)
 
-    result = searchIndexClient.create_index(index)                      
+    result = searchIndexClient.create_index(index)                    
 
 
 def addDocuments():
@@ -70,4 +70,6 @@ def addDocuments():
         }
         docs.append(d)
     result = client.upload_documents(documents=docs)
+
+
     
