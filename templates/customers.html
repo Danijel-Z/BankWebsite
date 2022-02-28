@@ -1,13 +1,13 @@
-{% extends 'index.html' %} {% block title %} - Customers VG {% endblock title %} {% block
+{% extends 'index.html' %} {% block title %} - Customers {% endblock title %} {% block
 individualCSS %} {% endblock individualCSS %} {% block main %}
 
 
 <div class="page-header">
-  <h3 class="page-title">Customers VG</h3>
+  <h3 class="page-title">Customers</h3>
   <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
-      <li class="breadcrumb-item"><a href="#">Databas</a></li>
-      <li class="breadcrumb-item active" aria-current="page">Customers VG</li>
+      <li class="breadcrumb-item"><a href="#">C_Bank</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Customers</li>
     </ol>
   </nav>
 </div>
@@ -29,7 +29,7 @@ individualCSS %} {% endblock individualCSS %} {% block main %}
               <input
                 type="text"
                 name="search"
-                value="{{ search }}"
+                value="{{ q }}"
                 class="form-control col-lg-9"
                 placeholder="Type in ID, City or Name..."
                 aria-label="Recipient's username"
@@ -54,13 +54,13 @@ individualCSS %} {% endblock individualCSS %} {% block main %}
                   Customer ID
                   <a
                     title="Sort Customer ID by ascending order "
-                    href="{{  url_for('customersVG',sortColumn='id',sortOrder='asc', search = search ) }}"
+                    href="{{  url_for('customers',sortColumn='Customer ID',sortOrder='asc', q = q ) }}"
                   >
                     <i class="mdi mdi-arrow-up"></i>
                   </a>
                   <a
                     title="Sort Customer ID by descending order"
-                    href="{{  url_for('customersVG',sortColumn='id',sortOrder='desc', search = search ) }}"
+                    href="{{  url_for('customers',sortColumn='Customer ID',sortOrder='desc', q = q ) }}"
                   >
                     <i class="mdi mdi-arrow-down"></i>
                   </a>
@@ -69,13 +69,13 @@ individualCSS %} {% endblock individualCSS %} {% block main %}
                   Birthday
                   <a
                     title="Sort Birthday by ascending order "
-                    href="{{  url_for('customersVG',sortColumn='Birthday',sortOrder='asc', search = search ) }}"
+                    href="{{  url_for('customers',sortColumn='Birthday',sortOrder='asc', q = q ) }}"
                   >
                     <i class="mdi mdi-arrow-up"></i>
                   </a>
                   <a
                     title="Sort Birthday by descending order "
-                    href="{{  url_for('customersVG',sortColumn='Birthday',sortOrder='desc', search = search ) }}"
+                    href="{{  url_for('customers',sortColumn='Birthday',sortOrder='desc', q = q ) }}"
                   >
                     <i class="mdi mdi-arrow-down"></i>
                   </a>
@@ -84,13 +84,13 @@ individualCSS %} {% endblock individualCSS %} {% block main %}
                   Name
                   <a
                     title="Sort Name by ascending order "
-                    href="{{  url_for('customersVG',sortColumn='Surname',sortOrder='asc', search = search ) }}"
+                    href="{{  url_for('customers',sortColumn='Name',sortOrder='asc', q = q ) }}"
                   >
                     <i class="mdi mdi-arrow-up"></i>
                   </a>
                   <a
                     title="Sort Name by descending order "
-                    href="{{  url_for('customersVG',sortColumn='Surname',sortOrder='desc', search = search ) }}"
+                    href="{{  url_for('customers',sortColumn='Name',sortOrder='desc', q = q ) }}"
                   >
                     <i class="mdi mdi-arrow-down"></i>
                   </a>
@@ -99,13 +99,13 @@ individualCSS %} {% endblock individualCSS %} {% block main %}
                   Streetaddress
                   <a
                     title="Sort Streetaddress by ascending order "
-                    href="{{  url_for('customersVG',sortColumn='Streetaddress',sortOrder='asc', search = search ) }}"
+                    href="{{  url_for('customers',sortColumn='Streetaddress',sortOrder='asc', q = q ) }}"
                   >
                     <i class="mdi mdi-arrow-up"></i>
                   </a>
                   <a
                     title="Sort Streetaddress by descending order "
-                    href="{{  url_for('customersVG',sortColumn='Streetaddress',sortOrder='desc', search = search ) }}"
+                    href="{{  url_for('customers',sortColumn='Streetaddress',sortOrder='desc', q = q ) }}"
                   >
                     <i class="mdi mdi-arrow-down"></i>
                   </a>
@@ -114,13 +114,13 @@ individualCSS %} {% endblock individualCSS %} {% block main %}
                   City
                   <a
                     title="Sort City by ascending order "
-                    href="{{  url_for('customersVG',sortColumn='City',sortOrder='asc', search = search ) }}"
+                    href="{{  url_for('customers',sortColumn='City',sortOrder='asc', q = q ) }}"
                   >
                     <i class="mdi mdi-arrow-up"></i>
                   </a>
                   <a
                     title="Sort City by descending order "
-                    href="{{  url_for('customersVG',sortColumn='City',sortOrder='desc', search = search ) }}"
+                    href="{{  url_for('customers',sortColumn='City',sortOrder='desc', q = q ) }}"
                   >
                     <i class="mdi mdi-arrow-down"></i>
                   </a>
@@ -128,7 +128,21 @@ individualCSS %} {% endblock individualCSS %} {% block main %}
               </tr>
             </thead>
             <tbody>
-              {% for customer in listOfCustomers %}
+              {% if kund %}
+              <tr>
+                <td>{{kund.id}}</td>
+                <td>{{kund.Birthday}}</td>
+                <td class="text-danger">
+                  {{kund.GivenName}} {{kund.Surname}}
+                  <i class="mdi mdi-arrow-down"></i>
+                </td>
+                <td>{{kund.Streetaddress}}</td>
+
+                <td>
+                  <label class="badge badge-danger">{{kund.City}}</label>
+                </td>
+              </tr>
+              {% else %} {% for customer in listOfCustomers %}
 
               <tr>
                 <td class="p-2">
@@ -150,7 +164,7 @@ individualCSS %} {% endblock individualCSS %} {% block main %}
                 </td>
                 <td>{{customer.Birthday}}</td>
                 <td class="text-danger">
-                  {{customer.Surname}} {{customer.GivenName}}
+                  {{customer.GivenName}} {{customer.Surname}}
                   <i class="mdi mdi-arrow-down"></i>
                 </td>
                 <td>{{customer.Streetaddress}}</td>
@@ -160,15 +174,15 @@ individualCSS %} {% endblock individualCSS %} {% block main %}
                 </td>
               </tr>
 
-              {% endfor %}
+              {% endfor %} {% endif %}
             </tbody>
             <tfoot>
               <tr>
                 <td class="text-left">
-                  {% if page > 1  %}
+                  {% if has_prev %}
                   <a
                     class="badge badge-danger col-12 d-flex align-self-center justify-content-center"
-                    href="{{ url_for('customersVG', page=page-1, sortColumn=sortColumn, sortOrder=sortOrder, search=search ) }}"
+                    href="{{ url_for('customers', page=page-1, sortColumn=sortColumn, sortOrder=sortOrder, q=q ) }}"
                   >
                     <i class="mdi mdi-arrow-left-bold-circle"></i> Prev
                   </a>
@@ -178,10 +192,10 @@ individualCSS %} {% endblock individualCSS %} {% block main %}
                 <td></td>
                 <td></td>
                 <td class="text-right">
-                  {% if page < pages %}
+                  {% if has_next %}
                   <a
                     class="badge badge-danger col-12 d-flex align-self-center justify-content-center"
-                    href="{{ url_for('customersVG', page=page+1, sortColumn=sortColumn, sortOrder=sortOrder,search=search) }}"
+                    href="{{ url_for('customers', page=page+1, sortColumn=sortColumn, sortOrder=sortOrder,q=q) }}"
                   >
                     Next <i class="mdi mdi-arrow-right-bold-circle"></i>
                   </a>

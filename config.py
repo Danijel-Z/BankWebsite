@@ -1,5 +1,6 @@
 class ConfigDebug():
-    SQLALCHEMY_DATABASE_URI = 'mysql+mysqlconnector://root:password@localhost/Bank'
+    # SQLALCHEMY_DATABASE_URI = 'mysql+mysqlconnector://root:password@localhost/Bank'
+    SQLALCHEMY_DATABASE_URI = 'mysql+mysqlconnector://danijel:daki_123@cbank.mysql.database.azure.com/cdatabase'
     SECRET_KEY = 'hejhej'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 

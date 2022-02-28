@@ -1,17 +1,17 @@
 {% extends 'index.html' %} {% from 'partials/_formHelpers.html' import
-render_field, render_selectField %} {% block title %} Test Startpage {% endblock
+render_field, render_selectField %} {% block title %} - Deposit Or Withdraw {% endblock
 title %} {% block individualCSS %} {% endblock individualCSS %} {% block main %}
-<div class="content-wrapper">
-  <div class="row">
-    <div class="col-sm-4 grid-margin">
-      <form method="post">
-        {{ form.hidden_tag() }} {{ render_field(form.fromAccount) }} {{
-        render_selectField(form.choice) }} {{ render_field(form.amount) }} {{
-        render_field(form.submit) }}
-      </form>
-    </div>
+
+<div class="row">
+  <div class="col-sm-4 grid-margin">
+    <form method="post">
+      {{ form.hidden_tag() }} {{ render_field(form.fromAccount) }} {{
+      render_selectField(form.choice) }} {{ render_field(form.amount) }} {{
+      render_field(form.submit) }}
+    </form>
   </div>
 </div>
+
 {% endblock main %}
 
 <!-- Plugin js and custom js for this page -->

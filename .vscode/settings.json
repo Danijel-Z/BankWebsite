@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/302042af-a206-4548-be60-1cd338bf4914/resourceGroups/appsvc_linux_centralus/providers/Microsoft.Web/sites/cbank01",
+    "appService.deploySubpath": "."
+}

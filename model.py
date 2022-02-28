@@ -98,11 +98,13 @@ user_manager = UserManager(None, db, User)
 def seedData():
     AddRoleIfNotExists("Admin")
     AddRoleIfNotExists("Cashier")
-    AddLoginIfNotExists("stefan.holmberg@systementor.se", "Hejsan123#",["Admin"])
-    AddLoginIfNotExists("stefan.holmberg@nackademin.se", "Hejsan123#",["Cashier"])
+    AddLoginIfNotExists("stefan.holmberg@systementor.se", "Hejsan123#",["Admin"], "Stefan")
+    AddLoginIfNotExists("stefan.holmberg@nackademin.se", "Hejsan123#",["Cashier"], "Stefan")
 
     antal = Customer.query.count()
-    while antal < 5000:
+    
+    while antal < 100:
+        print(f"Nu körs kund {antal}")
         customer = Customer()
 
         customer.GivenName, customer.Surname = barnum.create_name()
@@ -136,7 +138,7 @@ def seedData():
 
             for n in range(random.randint(0, 30)):
                 belopp = random.randint(0, 30)*100
-                tran = Transaction()
+                tran = Transaction("Debit", "Salary", datetime.now(), 1, 2, 1)
                 start = start + timedelta(days=-random.randint(10, 100))
                 if start > datetime.now():
                     break
@@ -189,13 +191,14 @@ def AddRoleIfNotExists(namn:str):
     db.session.commit()
 
 
-def AddLoginIfNotExists(email:str, passwd:str, roles:list[str]):
+def AddLoginIfNotExists(email:str, passwd:str, roles:list[str], firstName: str):
     if User.query.filter(User.email == email).first():
         return
     user = User()
     user.email=email
     user.email_confirmed_at=datetime.utcnow()
-    user.password=user_manager.hash_password(passwd)    
+    user.password=user_manager.hash_password(passwd)  
+    user.first_name = firstName  
     for roleName in roles:
         role = Role.query.filter(Role.name == roleName).first()
         user.roles.append(role)

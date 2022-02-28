@@ -1,6 +1,6 @@
-{% extends 'index.html' %} {% block title %} Test Startpage {% endblock title %}
+{% extends 'index.html' %} {% block title %}{% endblock title %}
 {% block individualCSS %} {% endblock individualCSS %} {% block main %}
-<div class="content-wrapper">
+
   <div class="row">
     <div class="col-sm-4 grid-margin">
       <div class="card">
@@ -10,7 +10,6 @@
             <div class="col-8 col-sm-12 col-xl-8 my-auto">
               <div class="d-flex d-sm-block d-md-flex align-items-center">
                 <h2 class="mb-0">{{numberOfCustomers}}</h2>
-                <p class="text-success ml-2 mb-0 font-weight-medium">+8%</p>
               </div>
               <h6 class="text-muted font-weight-normal">
                 460 Since last month
@@ -31,7 +30,6 @@
             <div class="col-8 col-sm-12 col-xl-8 my-auto">
               <div class="d-flex d-sm-block d-md-flex align-items-center">
                 <h2 class="mb-0">{{numberOfAccounts}}</h2>
-                <p class="text-success ml-2 mb-0 font-weight-medium">+6.67%</p>
               </div>
               <h6 class="text-muted font-weight-normal">
                 1400 Since last month
@@ -54,7 +52,6 @@
             <div class="col-8 col-sm-12 col-xl-8 my-auto">
               <div class="d-flex d-sm-block d-md-flex align-items-center">
                 <h2 class="mb-0">{{TotalAccountsMoney}}</h2>
-                <p class="text-danger ml-2 mb-0 font-weight-medium">-25%</p>
               </div>
               <h6 class="text-muted font-weight-normal">
                 200 000 Since last month
@@ -68,7 +65,7 @@
       </div>
     </div>
   </div>
-</div>
+
 {% endblock main %}
 
 <!-- Plugin js and custom js for this page -->

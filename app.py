@@ -4,7 +4,7 @@ from flask_migrate import Migrate, upgrade
 from sqlalchemy import desc, func
 from form import TransferForm, Deposit_Withdrawal_Form
 from model import db, seedData, Customer , Transaction, Account, User, user_manager
-from flask_user import roles_required, roles_accepted
+from flask_user import roles_required, roles_accepted, current_user
 from customerSearchEngine import addDocuments, createIndex, client
 
 app = Flask(__name__)
@@ -18,8 +18,6 @@ migrate = Migrate(app, db)
 user_manager.app = app
 user_manager.init_app(app,db,User) 
 
-
-######################## Rad 166 måste fixas ####################
 
 
 
@@ -101,19 +99,19 @@ def getOrder(sortColumn, sortOrder, page, searchWord):
 
 
 @app.route("/k", methods= ["POST", "GET"])
-def customers():
-
+def customersVG():
+    
     sortColumn = request.args.get('sortColumn', "id")
     sortOrder = request.args.get('sortOrder', "asc")
     page = int(request.args.get('page', 1))
 
     search = request.args.get('search','')
 
-    skip = (page-1) * 100
+    skip = (page-1) * 50
     result = client.search(search_text=search,
         include_total_count=True,skip=skip,
         top=50,
-        order_by=sortColumn + ' '  + sortOrder )
+        order_by= sortColumn + ' '  + sortOrder )
     total_pages = round( result.get_count()/50 )
     if total_pages == 0:
         total_pages = 1
@@ -145,7 +143,7 @@ def customerCard():
 
 
 @app.route("/transfer", methods=["POST", "GET"])
-#@roles_required("Admin") 
+@roles_required("Admin") 
 def transfer():
     form = TransferForm()
     if form.validate_on_submit():
@@ -180,7 +178,7 @@ def transfer():
 
 
 @app.route("/deposit&withdraw", methods=["POST", "GET"])
-#@roles_required("Admin") 
+@roles_required("Admin") 
 def deposit_withdraw():
     form = Deposit_Withdrawal_Form()
     if form.validate_on_submit():
@@ -229,12 +227,10 @@ def transaction(account_id):
                                 has_prev= paginationObject.has_prev, pages= paginationObject.pages , page = page)
     
     return redirect(url_for('customerCard', customer_id= customer_id ))
-    
 
 
-
-@app.route("/test", methods= ["GET", "POST"])
-def test():
+@app.route("/customers", methods= ["GET", "POST"])
+def customers():
     sortColumn = request.args.get('sortColumn')
     sortOrder = request.args.get('sortOrder')
     page = int(request.args.get('page', 1))
@@ -242,16 +238,11 @@ def test():
     listOfCustomers= getOrder(sortColumn, sortOrder, page, searchWord)
     
     join= db.session.query(Customer, Account).join(Account).where(Customer.id == 1544).order_by(desc(Account.Balance)).all()
-    # listOfCustomers = Customer.query.get(1544)
-    # listOfCustomers = Customer.query.limit(5).all()
-    allCustomers = Customer.query.count()
-    test = Customer.query.filter(Customer.id == 1544).first()
-    hej = Customer.query.limit(0.1*allCustomers+1).all()
+
     transaktioner = Account.query.all()
-    #listOfCustomers = db.session.query(Account).filter_by(id == 1).first()
-#.label('Money_Amount')
+   
     
-    return render_template("test.html",
+    return render_template("customers.html",
     join = join,  
     listOfCustomers = listOfCustomers.items, 
     page=page,
@@ -263,19 +254,17 @@ def test():
     pages= listOfCustomers.pages,
     transaktioner = transaktioner)
 
-@app.route("/tstartpage")
-def teststartpage():
-    # h = db.session.query(Customer)
-    # d = h.order_by(desc(Customer.id)).all()
+@app.route("/")
+def startpage():
     numberOfCustomers = Customer.query.count()
     numberOfAccounts =  Account.query.count()
     TotalAccountsMoney = db.session.query(func.sum(Account.Balance)).all()
     TotalAccountsMoney = "${:,}".format(TotalAccountsMoney[0][0])  
     
-    return render_template("teststartpage.html", numberOfAccounts = numberOfAccounts, numberOfCustomers= numberOfCustomers, TotalAccountsMoney = TotalAccountsMoney)
+    return render_template("startpage.html", numberOfAccounts = numberOfAccounts, numberOfCustomers= numberOfCustomers, TotalAccountsMoney = TotalAccountsMoney)
 
-@app.route("/")
-def startpage():
+@app.route("/tstartpage")
+def teststartpage():
     endastBalance= db.session.query(Account.Balance).all()
     numberOfCustomers = Customer.query.count()
     numberOfAccounts =  Account.query.count()
@@ -287,33 +276,6 @@ def startpage():
 def charts():
     return render_template("pages/charts/chartjs.html")
 
-@app.route("/forms")
-def forms():
-    return render_template("pages/forms/basic_elements.html")
-
-@app.route("/tables")
-def tables():
-    return render_template("pages/tables/basic-table.html")
-
-@app.route("/error404")
-def error404():
-    return render_template("pages/samples/error-404.html")
-
-@app.route("/error500")
-def error500():
-    return render_template("pages/samples/error-500.html")
-
-@app.route("/login")
-def login():
-    return render_template("pages/samples/login.html")
-
-@app.route("/flask")
-def flask_base():
-    return render_template("flask_user_layout.html")
-
-@app.route("/register")
-def register():
-    return render_template("pages/samples/register.html")
 
 
 ################### UI ELements #####################

@@ -7,7 +7,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1, shrink-to-fit=no"
     />
-    <title>{% block title %} Corona Admin {% endblock title %}</title>
+    <title> C_Bank {% block title %} {% endblock title %}</title>
     <!-- plugins:css -->
     <link
       rel="stylesheet"
@@ -62,8 +62,8 @@
         >
           <a class="sidebar-brand brand-logo" href="{{url_for('startpage')}}"
             ><img
-              src="{{url_for('static', filename='assets/images/logo.svg')}}"
-              alt="logo"
+              src="{{url_for('static', filename='assets/C_Bank_LOGO3.png ') }}"
+              alt="logo" style =  "width : 88% !important; height: 50px !important;"
           /></a>
           <a
             class="sidebar-brand brand-logo-mini"
@@ -85,66 +85,52 @@
                   />
                   <span class="count bg-success"></span>
                 </div>
+                {% if current_user.is_authenticated %}
+
+                  {% for role in current_user.roles %}
+
+                    {% if 'Admin' in role.name %}
+                    <div class="profile-name">
+                      <h5 class="mb-0 font-weight-normal">Admin</h5>
+                      <span>Premium Member</span>
+                    </div>
+                    {% elif 'Cashier' in role.name %}
+
+                    <div class="profile-name">
+                      <h5 class="mb-0 font-weight-normal">Cashier</h5>
+                      <span>Silver Member</span>
+                    </div>
+
+                    {% else %}
+                    <div class="profile-name">
+                      <h5 class="mb-0 font-weight-normal">Guest User</h5>
+                      <span>Guest Member</span>
+                    </div>
+
+                    {% endif %}
+
+                  {% endfor %}
+                
+                {% else %}
                 <div class="profile-name">
-                  <h5 class="mb-0 font-weight-normal">Martin Z</h5>
-                  <span>Gold Member</span>
+                  <h5 class="mb-0 font-weight-normal">Guest User</h5>
+                  <span>Guest Member</span>
                 </div>
+
+                {% endif %}
+
               </div>
-              <a href="#" id="profile-dropdown" data-toggle="dropdown"
-                ><i class="mdi mdi-dots-vertical"></i
-              ></a>
-              <div
-                class="dropdown-menu dropdown-menu-right sidebar-dropdown preview-list"
-                aria-labelledby="profile-dropdown"
-              >
-                <a href="#" class="dropdown-item preview-item">
-                  <div class="preview-thumbnail">
-                    <div class="preview-icon bg-dark rounded-circle">
-                      <i class="mdi mdi-settings text-primary"></i>
-                    </div>
-                  </div>
-                  <div class="preview-item-content">
-                    <p class="preview-subject ellipsis mb-1 text-small">
-                      Account settings
-                    </p>
-                  </div>
-                </a>
-                <div class="dropdown-divider"></div>
-                <a href="#" class="dropdown-item preview-item">
-                  <div class="preview-thumbnail">
-                    <div class="preview-icon bg-dark rounded-circle">
-                      <i class="mdi mdi-onepassword text-info"></i>
-                    </div>
-                  </div>
-                  <div class="preview-item-content">
-                    <p class="preview-subject ellipsis mb-1 text-small">
-                      Change Password
-                    </p>
-                  </div>
-                </a>
-                <div class="dropdown-divider"></div>
-                <a href="#" class="dropdown-item preview-item">
-                  <div class="preview-thumbnail">
-                    <div class="preview-icon bg-dark rounded-circle">
-                      <i class="mdi mdi-calendar-today text-success"></i>
-                    </div>
-                  </div>
-                  <div class="preview-item-content">
-                    <p class="preview-subject ellipsis mb-1 text-small">
-                      To-do list
-                    </p>
-                  </div>
-                </a>
-              </div>
+              
+              
             </div>
           </li>
           <li class="nav-item nav-category">
             <span class="nav-link">Navigation</span>
           </li>
           <li class="nav-item menu-items">
-            <a class="nav-link" href="{{url_for('teststartpage')}}">
+            <a class="nav-link" href="{{url_for('startpage')}}">
               <span class="menu-icon">
-                <i class="mdi mdi-wrench"></i>
+                <i class="mdi mdi-speedometer"></i>
               </span>
               <span class="menu-title">Startpage</span>
             </a>
@@ -179,60 +165,14 @@
             </div>
           </li>
           <li class="nav-item menu-items">
-            <a class="nav-link" href="{{url_for('test')}}">
+            <a class="nav-link" href="{{url_for('customers')}}">
               <span class="menu-icon">
                 <i class="mdi mdi-brightness-7"></i>
               </span>
               <span class="menu-title">List Of Customers</span>
             </a>
           </li>
-
-          <li class="nav-item menu-items">
-            <a
-              class="nav-link"
-              data-toggle="collapse"
-              href="#auth"
-              aria-expanded="false"
-              aria-controls="auth"
-            >
-              <span class="menu-icon">
-                <i class="mdi mdi-security"></i>
-              </span>
-              <span class="menu-title">User Pages</span>
-              <i class="menu-arrow"></i>
-            </a>
-            <div class="collapse" id="auth">
-              <ul class="nav flex-column sub-menu">
-                <li class="nav-item">
-                  <a class="nav-link" href="pages/samples/blank-page.html">
-                    Blank Page
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="{{url_for('error404')}}"> 404 </a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="{{url_for('error500')}}"> 500 </a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="{{url_for('login')}}"> Login </a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="{{url_for('register')}}">
-                    Register
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </li>
-          <li class="nav-item menu-items">
-            <a class="nav-link" href="{{url_for('startpage')}}">
-              <span class="menu-icon">
-                <i class="mdi mdi-speedometer"></i>
-              </span>
-              <span class="menu-title">Dashboard</span>
-            </a>
-          </li>
+          
           {% if current_user.is_authenticated %}
           <li class="nav-item menu-items">
             <a class="nav-link" href="{{ url_for('user.logout') }}">
@@ -277,17 +217,6 @@
             >
               <span class="mdi mdi-menu icon-md"></span>
             </button>
-            <ul class="navbar-nav w-100">
-              <li class="nav-item w-100">
-                <form class="nav-link mt-2 mt-md-0 d-none d-lg-flex search">
-                  <input
-                    type="text"
-                    class="form-control"
-                    placeholder="Search products"
-                  />
-                </form>
-              </li>
-            </ul>
             <ul class="navbar-nav navbar-nav-right">
               <li class="nav-item dropdown d-none d-lg-block">
                 <a
@@ -347,7 +276,7 @@
                 </div>
               </li>
               <li class="nav-item nav-settings d-none d-lg-block">
-                <a class="nav-link" href="#">
+                <a class="nav-link" href="{{url_for('startpage')}}" title="Startpage">
                   <i class="mdi mdi-view-grid"></i>
                 </a>
               </li>
@@ -489,9 +418,32 @@
                       src="{{url_for('static', filename='assets/images/faces/face15.jpg')}}"
                       alt=""
                     />
+                    {% if current_user.is_authenticated %}
+
+                      {% for role in current_user.roles %}
+
+                        {% if 'Admin' in role.name %}
+                        <p class="mb-0 d-none d-sm-block navbar-profile-name">
+                          Admin
+                        </p>
+                        {% elif 'Cashier' in role.name %}
+                        <p class="mb-0 d-none d-sm-block navbar-profile-name">
+                          Cashier
+                        </p>
+                        {% else %}
+                        <p class="mb-0 d-none d-sm-block navbar-profile-name">
+                          Guest
+                        </p>
+                        {% endif %}
+
+                      {% endfor %}
+
+                    {% else %}
                     <p class="mb-0 d-none d-sm-block navbar-profile-name">
-                      Martin Z
+                      Guest
                     </p>
+                    {% endif %}
+
                     <i class="mdi mdi-menu-down d-none d-sm-block"></i>
                   </div>
                 </a>
@@ -556,7 +508,6 @@
         </nav>
         <!-- partial -->
         <div class="main-panel">
-          {% block main%}
           <div class="content-wrapper">
             <div class="row">
               {% with messages = get_flashed_messages() %} {% if messages %} {%
@@ -564,6 +515,7 @@
               <div>{{message}}</div>
               {% endfor %} {% endif %} {% endwith %}
             </div>
+            {% block main%}
             <div class="row">
               <div class="col-12 grid-margin stretch-card">
                 <div class="card corona-gradient-card">
@@ -608,9 +560,7 @@
                           class="d-flex d-sm-block d-md-flex align-items-center"
                         >
                           <h2 class="mb-0">{{numberOfCustomers}}</h2>
-                          <p class="text-success ml-2 mb-0 font-weight-medium">
-                            +8%
-                          </p>
+                          
                         </div>
                         <h6 class="text-muted font-weight-normal">
                           460 Since last month
@@ -637,9 +587,7 @@
                           class="d-flex d-sm-block d-md-flex align-items-center"
                         >
                           <h2 class="mb-0">{{numberOfAccounts}}</h2>
-                          <p class="text-success ml-2 mb-0 font-weight-medium">
-                            +6.67%
-                          </p>
+                          
                         </div>
                         <h6 class="text-muted font-weight-normal">
                           1400 Since last month
@@ -666,9 +614,7 @@
                           class="d-flex d-sm-block d-md-flex align-items-center"
                         >
                           <h2 class="mb-0">{{TotalAccountsMoney}}</h2>
-                          <p class="text-danger ml-2 mb-0 font-weight-medium">
-                            -25%
-                          </p>
+                          
                         </div>
                         <h6 class="text-muted font-weight-normal">
                           200 000 Since last month
@@ -1463,8 +1409,8 @@
                 </div>
               </div>
             </div>
+            {% endblock main%}
           </div>
-          {% endblock main%}
           <!-- content-wrapper ends -->
           <!-- partial:partials/_footer.html -->
           <footer class="footer">
