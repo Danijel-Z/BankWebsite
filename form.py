@@ -4,8 +4,8 @@ from wtforms.validators import DataRequired, ValidationError, NumberRange
 from model import Account
 
 class TransferForm(FlaskForm):
-    fromAccount = StringField('From', validators=[DataRequired(message='Please choose a account')])
-    toAccount = StringField('To', validators=[DataRequired(message='Please choose a account')])
+    fromAccount = IntegerField('From', validators=[DataRequired(message='Please choose a account')])
+    toAccount = IntegerField('To', validators=[DataRequired(message='Please choose a account')])
     amount = IntegerField('Amount', validators=[DataRequired()])
     submit = SubmitField()
     

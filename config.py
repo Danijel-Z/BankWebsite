@@ -14,8 +14,9 @@ class ConfigDebug():
     MAIL_DEFAULT_SENDER = '"MyApp" <noreply@example.com>'
 
     # Flask-User settings
-    USER_APP_NAME = "Corona Bank"      # Shown in and email templates and page footers
+    USER_APP_NAME = "c_Bank"      # Shown in and email templates and page footers
     USER_ENABLE_EMAIL = True        # Enable email aution
     USER_ENABLE_USERNAME = False    # Disable username authentication
     USER_EMAIL_SENDER_NAME = USER_APP_NAME
+    USER_COPYRIGHT_YEAR = 2022
     USER_EMAIL_SENDER_EMAIL = "noreply@example.com"
