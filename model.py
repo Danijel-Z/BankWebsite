@@ -6,6 +6,14 @@ from flask_user import  UserMixin, UserManager
 
 db = SQLAlchemy()
 
+class Country(db.Model):
+    __tablename__ = "Countries"
+    id = db.Column(db.Integer, primary_key=True)
+    Name = db.Column(db.String(30), unique=False, nullable=False)
+    Code = db.Column(db.String(2), unique=False, nullable=False)
+    
+    Customers = db.relationship('Customer', backref='Country',
+                               lazy=True)
 
 class Customer(db.Model):
     __tablename__ = "Customers"
@@ -15,8 +23,6 @@ class Customer(db.Model):
     Streetaddress = db.Column(db.String(50), unique=False, nullable=False)
     City = db.Column(db.String(50), unique=False, nullable=False)
     Zipcode = db.Column(db.String(10), unique=False, nullable=False)
-    Country = db.Column(db.String(30), unique=False, nullable=False)
-    CountryCode = db.Column(db.String(2), unique=False, nullable=False)
     Birthday = db.Column(db.DateTime, unique=False, nullable=False)
     NationalId = db.Column(db.String(20), unique=False, nullable=False)
     TelephoneCountryCode = db.Column(db.Integer, unique=False, nullable=False)
@@ -25,6 +31,8 @@ class Customer(db.Model):
 
     Accounts = db.relationship('Account', backref='Customer',
                                lazy=True)
+    CountryId = db.Column(db.Integer, db.ForeignKey(
+        'Countries.id'), nullable=False)
 
 
 class Account(db.Model):
@@ -98,8 +106,13 @@ user_manager = UserManager(None, db, User)
 def seedData():
     AddRoleIfNotExists("Admin")
     AddRoleIfNotExists("Cashier")
+    
     AddLoginIfNotExists("stefan.holmberg@systementor.se", "Hejsan123#",["Admin"], "Stefan")
     AddLoginIfNotExists("stefan.holmberg@nackademin.se", "Hejsan123#",["Cashier"], "Stefan")
+    
+    AddCountryIfNotExist("USA", "US")
+    AddCountryIfNotExist("Great Britain", "GB")
+    AddCountryIfNotExist("Norway", "NO")
 
     antal = Customer.query.count()
     
@@ -110,9 +123,7 @@ def seedData():
         customer.GivenName, customer.Surname = barnum.create_name()
 
         customer.Streetaddress = barnum.create_street()
-        customer.Zipcode, customer.City, _ = barnum.create_city_state_zip()
-        customer.Country = "USA"
-        customer.CountryCode = "US"
+        customer.Zipcode, customer.City, _ = barnum.create_city_state_zip() 
         customer.Birthday = barnum.create_birthday()
         n = barnum.create_cc_number()
         customer.NationalId = customer.Birthday.strftime(
@@ -120,7 +131,8 @@ def seedData():
         customer.TelephoneCountryCode = 55
         customer.Telephone = barnum.create_phone()
         customer.EmailAddress = barnum.create_email().lower()
-
+        customer.CountryId = random.choice( range(1, 3) )
+        
         for x in range(random.randint(1, 4)):
             account = Account()
 
@@ -205,3 +217,19 @@ def AddLoginIfNotExists(email:str, passwd:str, roles:list[str], firstName: str):
 
     db.session.add(user)
     db.session.commit()
+
+def AddCountryIfNotExist(country:str, countrycode:str):
+
+    if Country.query.filter(Country.Name == country).first():
+        return
+
+    con = Country()
+    con.Code= countrycode
+    con.Name= country
+
+    db.session.add(con)
+    db.session.commit()
+
+
+
+    
