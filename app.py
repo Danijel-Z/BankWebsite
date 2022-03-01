@@ -198,7 +198,7 @@ def deposit_withdraw():
             db.session.add(newAccountTransaction)
             db.session.commit()
             
-
+            flash(f"Your {choice.lower()} has been succesfull!")
             return redirect( url_for('deposit_withdraw', form = form) )
         
     return render_template('deposit_withdraw.html', form = form )
