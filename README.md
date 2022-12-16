@@ -1,6 +1,6 @@
 # Webramverk
 
-En bankuppgift där man har 100 kunder i databasen. Man kan se all information om personen, som admin kan man till och med föra över och sätta in pengar i kundernas konton.
+A bank website whith 100 customers in the database. You can see all the information about each customer, as an admin you can even transfer and deposit money into the customers' accounts
 
 ![](static/assets/images/c_bank_1.jpg)
 ![](static/assets/images/c_bank_2.PNG)
